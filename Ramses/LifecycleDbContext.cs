@@ -1,16 +1,24 @@
 ﻿using Com.Setarit.Ramses.LifecycleListener;
 using Microsoft.EntityFrameworkCore;
-using System;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Com.Setarit.Ramses
 {
     public class LifecycleDbContext : DbContext
     {
+        public LifecycleDbContext(DbContextOptions options): base(options) { }
+
+        public override int SaveChanges() => this.SaveChanges(acceptAllChangesOnSuccess: true);
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+            => this.SaveChangesAsync(acceptAllChangesOnSuccess: true, cancellationToken: cancellationToken);
+
         public int SaveWithLifecycles(bool acceptAllChangesOnSuccess)
         {
-            base.ChangeTracker.DetectChanges();
-            var changedEntries = base.ChangeTracker.Entries();
+            var changedEntries = GetChangedEntries();
 
             //before saving
             HandleBeforeSaving(changedEntries);
@@ -23,8 +31,23 @@ namespace Com.Setarit.Ramses
 
             return entitiesSaved;
         }
+        public async Task<int> SaveWithLifecyclesAsync(bool acceptAllChangesOnSuccess)
+        {
+            var changedEntries = GetChangedEntries();
 
-        private void HandleAfterSaving(System.Collections.Generic.IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> changedEntries)
+            //before saving
+            HandleBeforeSaving(changedEntries);
+
+            //save
+            var entitiesSaved = await base.SaveChangesAsync(acceptAllChangesOnSuccess);
+
+            //after saving
+            HandleAfterSaving(changedEntries);
+
+            return entitiesSaved;
+        }
+
+        private void HandleAfterSaving(IEnumerable<EntityEntry> changedEntries)
         {
             foreach (var e in changedEntries.Where(e => e.State == EntityState.Added && e.Entity.GetType().IsSubclassOf(typeof(IAfterAddingListener))))
             {
@@ -43,7 +66,17 @@ namespace Com.Setarit.Ramses
             }
         }
 
-        private void HandleBeforeSaving(System.Collections.Generic.IEnumerable<Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry> changedEntries)
+        /// <summary>
+        /// Gets the changed entries according to the change tracker
+        /// </summary>
+        /// <returns>The changed entities</returns>
+        public IEnumerable<EntityEntry> GetChangedEntries()
+        {
+            base.ChangeTracker.DetectChanges();
+            return base.ChangeTracker.Entries(); 
+        }
+
+        private void HandleBeforeSaving(IEnumerable<EntityEntry> changedEntries)
         {
             foreach (var e in changedEntries.Where(e => e.State == EntityState.Added && e.Entity.GetType().IsSubclassOf(typeof(IBeforeAddingListener))))
             {
@@ -62,21 +95,5 @@ namespace Com.Setarit.Ramses
             }
         }
 
-        public async System.Threading.Tasks.Task<int> SaveWithLifecyclesAsync(bool acceptAllChangesOnSuccess)
-        {
-            base.ChangeTracker.DetectChanges();
-            var changedEntries = base.ChangeTracker.Entries();
-
-            //before saving
-            HandleBeforeSaving(changedEntries);
-
-            //save
-            var entitiesSaved = await base.SaveChangesAsync(acceptAllChangesOnSuccess);
-
-            //after saving
-            HandleAfterSaving(changedEntries);
-
-            return entitiesSaved;
-        }
     }
 }
