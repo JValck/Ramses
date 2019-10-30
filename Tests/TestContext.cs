@@ -1,5 +1,6 @@
 ﻿using Com.Setarit.Ramses;
 using Microsoft.EntityFrameworkCore;
+using System;
 using Tests.Model.Before;
 
 namespace Tests
@@ -12,5 +13,12 @@ namespace Tests
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<BeforeAddingModel>()
+                .Property(m => m.SavedAt)
+                .HasDefaultValueSql("getutcdate()");
+        }
     }
 }

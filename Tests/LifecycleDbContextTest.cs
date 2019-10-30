@@ -31,7 +31,12 @@ namespace Tests
             {
                 dbContext.BeforeAddingModels.Add(beforeAddingModel);
                 Assert.False(beforeAddingModel.CallbackCalled);
-                //check of called before onsave?
+
+                var saved = dbContext.SaveWithLifecycles();
+                Assert.Equal(1, saved);
+
+                Assert.True(beforeAddingModel.CallbackCalled);
+                Assert.True(beforeAddingModel.CallbackCalledAt < beforeAddingModel.SavedAt);
             }
         }
 

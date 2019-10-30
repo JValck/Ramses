@@ -10,6 +10,7 @@ namespace Tests.Model.After
         public void AfterAdding()
         {
             CallbackCalled = true;
+            CallbackCalledAt = DateTime.UtcNow;
         }
     }
 }

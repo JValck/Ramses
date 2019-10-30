@@ -12,9 +12,9 @@ namespace Com.Setarit.Ramses
     {
         public LifecycleDbContext(DbContextOptions options): base(options) { }
 
-        public override int SaveChanges() => this.SaveChanges(acceptAllChangesOnSuccess: true);
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-            => this.SaveChangesAsync(acceptAllChangesOnSuccess: true, cancellationToken: cancellationToken);
+        public int SaveWithLifecycles() => this.SaveWithLifecycles(acceptAllChangesOnSuccess: true);
+        public Task<int> SaveWithLifecyclesAsync(CancellationToken cancellationToken = default)
+            => this.SaveWithLifecyclesAsync(acceptAllChangesOnSuccess: true, cancellationToken: cancellationToken);
 
         public int SaveWithLifecycles(bool acceptAllChangesOnSuccess)
         {
@@ -31,7 +31,7 @@ namespace Com.Setarit.Ramses
 
             return entitiesSaved;
         }
-        public async Task<int> SaveWithLifecyclesAsync(bool acceptAllChangesOnSuccess)
+        public async Task<int> SaveWithLifecyclesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
             var changedEntries = GetChangedEntries();
 
@@ -39,7 +39,7 @@ namespace Com.Setarit.Ramses
             HandleBeforeSaving(changedEntries);
 
             //save
-            var entitiesSaved = await base.SaveChangesAsync(acceptAllChangesOnSuccess);
+            var entitiesSaved = await base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
 
             //after saving
             HandleAfterSaving(changedEntries);
@@ -48,18 +48,18 @@ namespace Com.Setarit.Ramses
         }
 
         private void HandleAfterSaving(IEnumerable<EntityEntry> changedEntries)
-        {
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Added && e.Entity.GetType().IsSubclassOf(typeof(IAfterAddingListener))))
+        {            
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Added && e.Entity.GetType().GetInterface(typeof(IAfterAddingListener).FullName) != null))
             {
                 IAfterAddingListener listener = e.Entity as IAfterAddingListener;
                 listener.AfterAdding();
             }
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Deleted && e.Entity.GetType().IsSubclassOf(typeof(IAfterDeletionListener))))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Deleted && e.Entity.GetType().GetInterface(typeof(IAfterDeletionListener).FullName) != null))
             {
                 IAfterDeletionListener listener = e.Entity as IAfterDeletionListener;
                 listener.AfterDeletion();
             }
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Modified && e.Entity.GetType().IsSubclassOf(typeof(IAfterUpdateListener))))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Modified && e.Entity.GetType().GetInterface(typeof(IAfterUpdateListener).FullName) != null))
             {
                 IAfterUpdateListener listener = e.Entity as IAfterUpdateListener;
                 listener.AfterUpdate();
@@ -78,17 +78,17 @@ namespace Com.Setarit.Ramses
 
         private void HandleBeforeSaving(IEnumerable<EntityEntry> changedEntries)
         {
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Added && e.Entity.GetType().IsSubclassOf(typeof(IBeforeAddingListener))))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Added && e.Entity.GetType().GetInterface(typeof(IBeforeAddingListener).FullName) != null))
             {
                 IBeforeAddingListener listener = e.Entity as IBeforeAddingListener;
                 listener.BeforeAdding();
             }
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Deleted && e.Entity.GetType().IsSubclassOf(typeof(IBeforeDeletionListener))))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Deleted && e.Entity.GetType().GetInterface(typeof(IBeforeDeletionListener).FullName) != null))
             {
                 IBeforeDeletionListener listener = e.Entity as IBeforeDeletionListener;
                 listener.BeforeDeletion();
             }
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Modified && e.Entity.GetType().IsSubclassOf(typeof(IBeforeUpdateListener))))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Modified && e.Entity.GetType().GetInterface(typeof(IBeforeUpdateListener).FullName) != null))
             {
                 IBeforeUpdateListener listener = e.Entity as IBeforeUpdateListener;
                 listener.BeforeUpdate();
