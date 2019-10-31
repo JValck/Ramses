@@ -10,6 +10,11 @@ namespace Com.Setarit.Ramses
 {
     public class LifecycleDbContext : DbContext
     {
+        /// <summary>
+        /// Parameterless constructor, required for allowing migrations
+        /// </summary>
+        public LifecycleDbContext() { }
+
         public LifecycleDbContext(DbContextOptions options): base(options) { }
 
         public int SaveWithLifecycles() => this.SaveWithLifecycles(acceptAllChangesOnSuccess: true);

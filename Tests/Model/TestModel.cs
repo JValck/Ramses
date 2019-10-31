@@ -27,9 +27,14 @@ namespace Tests.Model
         public DateTime CallbackCalledAt { get; set; }
 
         /// <summary>
-        /// The datetime when the model is saved
+        /// The datetime when the model is saved as milliseconds
         /// </summary>
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public DateTime SavedAt { get; set; }
+        public int SavedAt { get; set; }
+
+        public DateTime GetSavedAtInDateTime()
+        {
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            return epoch.AddSeconds(SavedAt);
+        }
     }
 }
