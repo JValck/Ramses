@@ -18,9 +18,16 @@ namespace Tests
             using (var dbContext = new TestLifecycleDbContext())
             {
                 dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
-                dbContext.Database.ExecuteSqlCommand(
-                @"
+            }
+
+            using (var dbContext = new TestLifecycleDbContext())
+            {
+                //dbContext.Database.EnsureDeleted();
+                try
+                {
+                    dbContext.Database.EnsureCreated();
+                    dbContext.Database.ExecuteSqlCommand(
+                    @"
                     CREATE TRIGGER SetSavedAtAfterAddingTrigger
                     AFTER INSERT ON aa_models
                     BEGIN
@@ -29,13 +36,15 @@ namespace Tests
                         WHERE Id = NEW.Id;
                     END
                 ");
+                }
+                catch { }
             }
         }
 
         [Fact]
         public void SaveWithLifecyclesCallsLifecycleHookAfterSaving()
         {
-            using(var dbContext = new TestLifecycleDbContext())
+            using (var dbContext = new TestLifecycleDbContext())
             {
                 dbContext.AfterAddingModels.Add(afterAddingModel);
                 Assert.False(afterAddingModel.CallbackCalled);
@@ -46,7 +55,7 @@ namespace Tests
             }
             using (var dbContext = new TestLifecycleDbContext())
             {
-                var refreshed = dbContext.AfterAddingModels.First(m => m.Id == afterAddingModel.Id);                
+                var refreshed = dbContext.AfterAddingModels.First(m => m.Id == afterAddingModel.Id);
                 Assert.True(afterAddingModel.CallbackCalled);
                 Assert.True(afterAddingModel.CallbackCalledAt > refreshed.GetSavedAtInDateTime());
             }

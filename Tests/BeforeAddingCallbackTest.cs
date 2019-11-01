@@ -13,12 +13,18 @@ namespace Tests
         public BeforeAddingCallbackTest()
         {
             beforeAddingModel = new BeforeAddingModel();
-            using(var dbContext = new TestLifecycleDbContext())
+            using (var dbContext = new TestLifecycleDbContext())
             {
                 dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
-                dbContext.Database.ExecuteSqlCommand(
-                @"
+            }
+            using (var dbContext = new TestLifecycleDbContext())
+            {
+                //dbContext.Database.EnsureDeleted();
+                try
+                {
+                    dbContext.Database.EnsureCreated();
+                    dbContext.Database.ExecuteSqlCommand(
+                    @"
                     CREATE TRIGGER SetSavedAtBeforeAddingTrigger
                     AFTER INSERT ON ba_models
                     BEGIN
@@ -27,6 +33,8 @@ namespace Tests
                         WHERE Id = NEW.Id;
                     END
                 ");
+                }
+                catch  { }
             }
         }
 
