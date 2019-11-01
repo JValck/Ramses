@@ -1,6 +1,7 @@
 ﻿using Com.Setarit.Ramses;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Tests.Model.After;
 using Tests.Model.Before;
 
 namespace Tests
@@ -8,6 +9,7 @@ namespace Tests
     public class TestLifecycleDbContext : LifecycleDbContext
     {
         public DbSet<BeforeAddingModel> BeforeAddingModels { get; set; }
+        public DbSet<AfterAddingModel> AfterAddingModels { get; set; }
 
         public TestLifecycleDbContext() { }
 

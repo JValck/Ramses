@@ -2,10 +2,11 @@ using Xunit;
 using Microsoft.EntityFrameworkCore;
 using Tests.Model.Before;
 using System.Linq;
+using System;
 
 namespace Tests
 {
-    public class BeforeAddingCallbackTest
+    public class BeforeAddingCallbackTest 
     {
         private BeforeAddingModel beforeAddingModel;        
 

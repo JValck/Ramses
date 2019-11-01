@@ -1,4 +1,5 @@
-﻿using Com.Setarit.Ramses.LifecycleListener;
+﻿using Com.Setarit.Ramses.ChangeTracker;
+using Com.Setarit.Ramses.LifecycleListener;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Collections.Generic;
@@ -52,50 +53,61 @@ namespace Com.Setarit.Ramses
             return entitiesSaved;
         }
 
-        private void HandleAfterSaving(IEnumerable<EntityEntry> changedEntries)
+        private void HandleAfterSaving(IEnumerable<Entity> changedEntries)
         {            
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Added && e.Entity.GetType().GetInterface(typeof(IAfterAddingListener).FullName) != null))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Added && e.Item.GetType().GetInterface(typeof(IAfterAddingListener).FullName) != null))
             {
-                IAfterAddingListener listener = e.Entity as IAfterAddingListener;
+                IAfterAddingListener listener = e.Item as IAfterAddingListener;
                 listener.AfterAdding();
             }
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Deleted && e.Entity.GetType().GetInterface(typeof(IAfterDeletionListener).FullName) != null))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Deleted && e.Item.GetType().GetInterface(typeof(IAfterDeletionListener).FullName) != null))
             {
-                IAfterDeletionListener listener = e.Entity as IAfterDeletionListener;
+                IAfterDeletionListener listener = e.Item as IAfterDeletionListener;
                 listener.AfterDeletion();
             }
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Modified && e.Entity.GetType().GetInterface(typeof(IAfterUpdateListener).FullName) != null))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Modified && e.Item.GetType().GetInterface(typeof(IAfterUpdateListener).FullName) != null))
             {
-                IAfterUpdateListener listener = e.Entity as IAfterUpdateListener;
+                IAfterUpdateListener listener = e.Item as IAfterUpdateListener;
                 listener.AfterUpdate();
             }
         }
 
         /// <summary>
-        /// Gets the changed entries according to the change tracker
+        /// Gets the changed entries according to the change tracker and returns them as a copy
+        /// so they won't get updated if the changetracker updates the entity state
         /// </summary>
         /// <returns>The changed entities</returns>
-        public IEnumerable<EntityEntry> GetChangedEntries()
+        public IEnumerable<Entity> GetChangedEntries()
         {
             base.ChangeTracker.DetectChanges();
-            return base.ChangeTracker.Entries(); 
+            var entries = base.ChangeTracker.Entries();
+            var clone = new List<Entity>(entries.Count());
+            Parallel.ForEach(entries, (entry) =>
+            {
+                clone.Add(new Entity
+                {
+                    State = entry.State,
+                    Item = entry.Entity,
+                });
+            });
+            return clone;
         }
 
-        private void HandleBeforeSaving(IEnumerable<EntityEntry> changedEntries)
+        private void HandleBeforeSaving(IEnumerable<Entity> changedEntries)
         {
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Added && e.Entity.GetType().GetInterface(typeof(IBeforeAddingListener).FullName) != null))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Added && e.Item.GetType().GetInterface(typeof(IBeforeAddingListener).FullName) != null))
             {
-                IBeforeAddingListener listener = e.Entity as IBeforeAddingListener;
+                IBeforeAddingListener listener = e.Item as IBeforeAddingListener;
                 listener.BeforeAdding();
             }
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Deleted && e.Entity.GetType().GetInterface(typeof(IBeforeDeletionListener).FullName) != null))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Deleted && e.Item.GetType().GetInterface(typeof(IBeforeDeletionListener).FullName) != null))
             {
-                IBeforeDeletionListener listener = e.Entity as IBeforeDeletionListener;
+                IBeforeDeletionListener listener = e.Item as IBeforeDeletionListener;
                 listener.BeforeDeletion();
             }
-            foreach (var e in changedEntries.Where(e => e.State == EntityState.Modified && e.Entity.GetType().GetInterface(typeof(IBeforeUpdateListener).FullName) != null))
+            foreach (var e in changedEntries.Where(e => e.State == EntityState.Modified && e.Item.GetType().GetInterface(typeof(IBeforeUpdateListener).FullName) != null))
             {
-                IBeforeUpdateListener listener = e.Entity as IBeforeUpdateListener;
+                IBeforeUpdateListener listener = e.Item as IBeforeUpdateListener;
                 listener.BeforeUpdate();
             }
         }
