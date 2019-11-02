@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <RootNamespace>Com.Setarit.Ramses</RootNamespace>
     <LangVersion>7.1</LangVersion>
     <Authors>JValck</Authors>
@@ -9,15 +9,15 @@
     <Description>Lifecycle hooks for EF Core</Description>
     <PackageProjectUrl>https://github.com/JValck/Ramses</PackageProjectUrl>
     <Copyright>MIT</Copyright>
-    <PackageReleaseNotes>First release for EF Core 2.*</PackageReleaseNotes>
+    <PackageReleaseNotes>First release for EF Core 3.*</PackageReleaseNotes>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseUrl>https://github.com/JValck/Ramses/blob/master/LICENSE.md</PackageLicenseUrl>
-    <Version>2.0.0</Version>
+    <Version>3.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
   </ItemGroup>
 
 </Project>
