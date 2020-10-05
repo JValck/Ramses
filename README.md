@@ -10,7 +10,7 @@ The project is licensed under the MIT license.
 
 ## Which version should I install?
 If you are targeting .NET Core `2.*`, then install version `2.*` by invoking `Install-Package Ramses -Version 2.0.0`.
-Targeting .NET Core `3.*`? Install version `3.*` by invoking `Install-Package Ramses -Version 3.0.0`
+Targeting .NET Core `3.*`? Install version `3.*` by invoking `Install-Package Ramses -Version 3.0.1`
 
 ## Possible lifecycle hooks
 | Lifecycle hook        | Interface           |
