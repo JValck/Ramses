@@ -1,7 +1,7 @@
 ﻿using Com.Setarit.Ramses.ChangeTracker;
 using Com.Setarit.Ramses.LifecycleListener;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -81,7 +81,7 @@ namespace Com.Setarit.Ramses
         {
             base.ChangeTracker.DetectChanges();
             var entries = base.ChangeTracker.Entries();
-            var clone = new List<Entity>(entries.Count());
+            var clone = new ConcurrentBag<Entity>();
             Parallel.ForEach(entries, (entry) =>
             {
                 clone.Add(new Entity
