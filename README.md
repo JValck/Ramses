@@ -3,14 +3,14 @@ Lifecycle hooks for EF Core.
 The project is licensed under the MIT license.
 
 ## Getting started
-1. Install the package from [NuGet](link)
+1. Install the package from [NuGet](https://www.nuget.org/packages/Ramses)
 2. Make your `DbContext` extend from `LifecycleDbContext`
 3. Call the `SaveWithLifecycles` or async variant to allow hooking into the lifecycle
 4. Make your model(s) implement one of the provided lifecycle interfaces
 
 ## Which version should I install?
-If you are targeting .NET Core 2.*, then install version 2.* by invoking `Install-Package Ramses -Version 2.0.0`.
-Targeting .NET Core 3.*? Install version 3.* by invoking `Install-Package Ramses -Version 3.0.0`
+If you are targeting .NET Core `2.*`, then install version `2.*` by invoking `Install-Package Ramses -Version 2.0.0`.
+Targeting .NET Core `3.*`? Install version `3.*` by invoking `Install-Package Ramses -Version 3.0.0`
 
 ## Possible lifecycle hooks
 | Lifecycle hook        | Interface           |
