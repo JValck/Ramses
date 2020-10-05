@@ -9,11 +9,11 @@
     <Description>Lifecycle hooks for EF Core</Description>
     <PackageProjectUrl>https://github.com/JValck/Ramses</PackageProjectUrl>
     <Copyright>MIT</Copyright>
-    <PackageReleaseNotes>First release for EF Core 2.*</PackageReleaseNotes>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageReleaseNotes>Patch release for EF Core 2.*</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseUrl>https://github.com/JValck/Ramses/blob/master/LICENSE.md</PackageLicenseUrl>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
